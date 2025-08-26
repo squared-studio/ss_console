@@ -59,6 +59,8 @@ package verilog_serial_pkg;
     end
   endfunction
 
+  mailbox #(bit [7:0]) char_mbx = new();  // TODO
+  // TODO
   task automatic input_file(input string file_name);
     longint last_char_pos;
     longint curr_char_pos;
@@ -77,6 +79,7 @@ package verilog_serial_pkg;
           curr_char_pos++;
           if (curr_char_pos > last_char_pos) begin
             $write("%c", character);
+            char_mbx.put(character);  // TODO
             last_char_pos = curr_char_pos;
           end
         end
@@ -96,6 +99,16 @@ package verilog_serial_pkg;
     build_script();
     fork
       input_file($sformatf("%s.i.ss_console", port_name));
+      begin  // TODO
+        int       fh;  // TODO
+        bit [7:0] char;  // TODO
+        forever begin  // TODO
+          fh = $fopen($sformatf("%s.o.ss_console", port_name), "a");  // TODO
+          char_mbx.get(char);  // TODO
+          $fwrite(fh, "%c", char + 1);  // TODO
+          $fclose(fh);  // TODO
+        end  // TODO
+      end  // TODO
       $system($sformatf("start \"Git Bash\" \"bash.exe\" --login -c './run_console.sh -p %s'",
                         port_name));
     join_none
